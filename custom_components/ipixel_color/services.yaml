@@ -52,3 +52,53 @@ display_text:
       default: [0, 0, 0]
       selector:
         color_rgb:
+
+display_media:
+  name: Display remote media
+  description: Download a small public HTTPS PNG or GIF and display it without saving to a hardware slot.
+  fields:
+    device_id:
+      name: Device
+      description: iPIXEL display to control.
+      required: true
+      selector:
+        device:
+          integration: ipixel_color
+    url:
+      name: HTTPS media URL
+      description: Direct public URL for a PNG or GIF up to 2 MB.
+      required: true
+      selector:
+        text:
+          type: url
+    fit:
+      name: Fit
+      description: Fit with black padding or fill the panel by cropping.
+      required: false
+      default: fit
+      selector:
+        select:
+          options:
+            - fit
+            - crop
+
+show_slot:
+  name: Show existing slot
+  description: Display an existing device slot without changing its contents.
+  fields:
+    device_id:
+      name: Device
+      description: iPIXEL display to control.
+      required: true
+      selector:
+        device:
+          integration: ipixel_color
+    slot:
+      name: Slot
+      description: Existing slot number. Empty slots may cause the device to cycle through stored content.
+      required: true
+      selector:
+        number:
+          min: 1
+          max: 255
+          mode: box

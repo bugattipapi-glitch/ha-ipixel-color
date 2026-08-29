@@ -5,9 +5,11 @@ from typing import Optional
 
 try:
     from pypixelcolor.commands.send_image import send_image_hex
+    from pypixelcolor.commands.show_slot import show_slot
     from pypixelcolor.lib.transport.send_plan import SendPlan
 except ImportError:
     send_image_hex = None
+    show_slot = None
     SendPlan = None
 
 
@@ -15,7 +17,8 @@ def make_image_command(
     image_bytes: bytes,
     file_extension: str = ".png",
     resize_method: str = "crop",
-    device_info_dict: Optional[dict] = None
+    device_info_dict: Optional[dict] = None,
+    save_slot: int = 0,
 ) -> list[bytes]:
     """Build image display command using pypixelcolor.
 
@@ -26,6 +29,7 @@ def make_image_command(
                       'crop' will fill the entire target area and crop excess
                       'fit' will fit the entire image with black padding
         device_info_dict: Device information dict from api.get_device_info()
+        save_slot: Device storage slot, or 0 to display without saving
 
     Returns:
         List of command bytes (one per window/frame)
@@ -59,7 +63,8 @@ def make_image_command(
         hex_string=hex_string,
         file_extension=file_extension,
         resize_method=resize_method,
-        device_info=device_info
+        device_info=device_info,
+        save_slot=save_slot,
     )
 
     # Extract command bytes from all windows
@@ -68,3 +73,12 @@ def make_image_command(
         commands.append(window.data)
 
     return commands
+
+
+def make_show_slot_command(number: int) -> list[bytes]:
+    """Build the command that displays an existing device slot."""
+    if show_slot is None:
+        raise ImportError("pypixelcolor library is not installed")
+
+    send_plan = show_slot(number)
+    return [window.data for window in send_plan.windows]

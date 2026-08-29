@@ -15,7 +15,7 @@ from .device.commands import (
 )
 from .device.clock import make_clock_mode_command, make_time_command
 from .device.text import make_text_command
-from .device.image import make_image_command
+from .device.image import make_image_command, make_show_slot_command
 from .device.info import build_device_info_command, parse_device_response
 from .display.text_renderer import render_text_to_png
 from .exceptions import iPIXELConnectionError
@@ -38,6 +38,7 @@ class iPIXELAPI:
         self._power_state = False
         self._device_info: dict[str, Any] | None = None
         self._device_response: bytes | None = None
+        self._media_lock = asyncio.Lock()
         
     async def connect(self) -> bool:
         """Connect to the iPIXEL device."""
@@ -334,6 +335,61 @@ class iPIXELAPI:
 
         except Exception as err:
             _LOGGER.error("Error displaying pypixelcolor text: %s", err)
+            return False
+
+    async def display_media(
+        self,
+        image_bytes: bytes,
+        file_extension: str,
+        resize_method: str = "fit",
+    ) -> bool:
+        """Display validated PNG or GIF bytes without writing a device slot."""
+        try:
+            async with self._media_lock:
+                if not self.is_connected:
+                    await self.connect()
+
+                device_info = await self.get_device_info()
+                commands = make_image_command(
+                    image_bytes=image_bytes,
+                    file_extension=file_extension,
+                    resize_method=resize_method,
+                    device_info_dict=device_info,
+                    save_slot=0,
+                )
+                for index, command in enumerate(commands):
+                    success = await self._bluetooth.send_command(command)
+                    if not success:
+                        _LOGGER.error(
+                            "Failed to send media frame %d/%d",
+                            index + 1,
+                            len(commands),
+                        )
+                        return False
+
+                _LOGGER.info(
+                    "Displayed %s media (%d bytes, %d command windows)",
+                    file_extension,
+                    len(image_bytes),
+                    len(commands),
+                )
+                return True
+        except Exception as err:
+            _LOGGER.error("Error displaying media: %s", err)
+            return False
+
+    async def show_slot(self, number: int) -> bool:
+        """Display an existing hardware slot without modifying slot contents."""
+        try:
+            async with self._media_lock:
+                if not self.is_connected:
+                    await self.connect()
+                for command in make_show_slot_command(number):
+                    if not await self._bluetooth.send_command(command):
+                        return False
+                return True
+        except Exception as err:
+            _LOGGER.error("Error showing slot %d: %s", number, err)
             return False
 
     def _notification_handler(self, sender: Any, data: bytearray) -> None:

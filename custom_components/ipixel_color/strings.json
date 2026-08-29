@@ -44,5 +44,39 @@
         "name": "Power"
       }
     }
+  },
+  "services": {
+    "display_media": {
+      "name": "Display remote media",
+      "description": "Download a small public HTTPS PNG or GIF and display it without saving to a hardware slot.",
+      "fields": {
+        "device_id": {
+          "name": "Device",
+          "description": "iPIXEL display to control."
+        },
+        "url": {
+          "name": "HTTPS media URL",
+          "description": "Direct public URL for a PNG or GIF up to 2 MB."
+        },
+        "fit": {
+          "name": "Fit",
+          "description": "Fit with black padding or fill the panel by cropping."
+        }
+      }
+    },
+    "show_slot": {
+      "name": "Show existing slot",
+      "description": "Display an existing device slot without changing its contents.",
+      "fields": {
+        "device_id": {
+          "name": "Device",
+          "description": "iPIXEL display to control."
+        },
+        "slot": {
+          "name": "Slot",
+          "description": "Existing slot number."
+        }
+      }
+    }
   }
 }

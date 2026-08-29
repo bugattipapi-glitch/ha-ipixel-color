@@ -18,6 +18,7 @@ These displays have been recently available as B.K. Light LED Pixel Board from A
 - **State Persistence**: Settings preserved across HA restarts
 - **Bluetooth Proxy Support**: Compatible with Bluetooth proxy devices
 - **Auto-discovery**: Finds iPIXEL devices automatically via Bluetooth
+- **Safe GIF/PNG Playback**: Display bounded public HTTPS media without writing hardware slots
 
 ## Installation
 
@@ -26,7 +27,7 @@ These displays have been recently available as B.K. Light LED Pixel Board from A
 1. Open HACS in Home Assistant
 2. Click on the three dots in the top right corner
 3. Select **Custom repositories**
-4. Add the repository URL: `https://github.com/cagcoach/ha-ipixel-color`
+4. Add the repository URL: `https://github.com/bugattipapi-glitch/ha-ipixel-color`
 5. Select **Integration** as the category
 6. Click **Add**
 7. Search for "iPIXEL Color" in HACS and install it
@@ -85,6 +86,17 @@ Temp: {{ states('sensor.temperature') | round(1) }}°C
 
 ## Quick Start
 
+**GIF/PNG Media:**
+1. Call `ipixel_color.display_media`
+2. Select the iPIXEL device
+3. Provide a direct public HTTPS PNG or GIF URL
+4. Choose `fit` or `crop`
+
+Media playback is deliberately unslotted (`save_slot=0`). The service rejects
+redirects, private-network targets, oversized files, excessive frame counts,
+and overlong loops. See [MEDIA-SERVICE.md](MEDIA-SERVICE.md) for the complete
+safety limits and examples.
+
 **Text Mode:**
 1. Select mode: `textimage` (for RGB colors) or `text` (native)
 2. Set text: `"Hello\nWorld"`
@@ -125,7 +137,7 @@ Temp: {{ states('sensor.temperature') | round(1) }}°C
 | ✅ Templates | Complete |
 | ✅ State Persistence | Complete |
 | ✅ Brightness Control | Complete |
-| 🔄 GIF Animations | Planned |
+| ✅ Bounded remote GIF/PNG playback | Complete |
 | 🔄 Animated Variable-Width Fonts | Planned |
 
 ## Technical
