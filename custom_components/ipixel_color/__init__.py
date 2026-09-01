@@ -15,6 +15,7 @@ from homeassistant.helpers import device_registry as dr
 from .api import iPIXELAPI, iPIXELConnectionError, iPIXELTimeoutError
 from .const import DOMAIN, CONF_ADDRESS, CONF_NAME
 from .media import async_download_media
+from .ticker import render_ticker_gif
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -22,6 +23,7 @@ _LOGGER = logging.getLogger(__name__)
 PLATFORMS: list[Platform] = [Platform.SWITCH, Platform.TEXT, Platform.SENSOR, Platform.SELECT, Platform.NUMBER, Platform.BUTTON, Platform.LIGHT]
 
 SERVICE_DISPLAY_MEDIA = "display_media"
+SERVICE_DISPLAY_TICKER = "display_ticker"
 SERVICE_SHOW_SLOT = "show_slot"
 
 DISPLAY_MEDIA_SCHEMA = vol.Schema(
@@ -36,6 +38,20 @@ SHOW_SLOT_SCHEMA = vol.Schema(
     {
         vol.Required(ATTR_DEVICE_ID): cv.string,
         vol.Required("slot"): vol.All(vol.Coerce(int), vol.Range(min=1, max=255)),
+    }
+)
+
+DISPLAY_TICKER_SCHEMA = vol.Schema(
+    {
+        vol.Required(ATTR_DEVICE_ID): cv.string,
+        vol.Required("header"): vol.All(cv.string, vol.Length(min=1, max=12)),
+        vol.Required("ticker"): vol.All(cv.string, vol.Length(min=1, max=160)),
+        vol.Optional("header_color", default="50ffa0"): vol.Match(r"^[0-9A-Fa-f]{6}$"),
+        vol.Optional("ticker_color", default="ffc040"): vol.Match(r"^[0-9A-Fa-f]{6}$"),
+        vol.Optional("background_color", default="02061e"): vol.Match(r"^[0-9A-Fa-f]{6}$"),
+        vol.Optional("frame_duration", default=140): vol.All(
+            vol.Coerce(int), vol.Range(min=80, max=500)
+        ),
     }
 )
 
@@ -112,6 +128,27 @@ def _register_services(hass: HomeAssistant) -> None:
             schema=DISPLAY_MEDIA_SCHEMA,
         )
 
+    if not hass.services.has_service(DOMAIN, SERVICE_DISPLAY_TICKER):
+        async def _display_ticker(call: ServiceCall) -> None:
+            api = _api_for_device(hass, call.data[ATTR_DEVICE_ID])
+            image_bytes = render_ticker_gif(
+                call.data["header"],
+                call.data["ticker"],
+                header_color=call.data["header_color"],
+                ticker_color=call.data["ticker_color"],
+                background_color=call.data["background_color"],
+                frame_duration=call.data["frame_duration"],
+            )
+            if not await api.display_media(image_bytes, ".gif", "fit"):
+                raise HomeAssistantError("The iPIXEL display did not accept the ticker")
+
+        hass.services.async_register(
+            DOMAIN,
+            SERVICE_DISPLAY_TICKER,
+            _display_ticker,
+            schema=DISPLAY_TICKER_SCHEMA,
+        )
+
     if not hass.services.has_service(DOMAIN, SERVICE_SHOW_SLOT):
         async def _show_slot(call: ServiceCall) -> None:
             api = _api_for_device(hass, call.data[ATTR_DEVICE_ID])
@@ -142,6 +179,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
         if not hass.data[DOMAIN]:
             hass.services.async_remove(DOMAIN, SERVICE_DISPLAY_MEDIA)
+            hass.services.async_remove(DOMAIN, SERVICE_DISPLAY_TICKER)
             hass.services.async_remove(DOMAIN, SERVICE_SHOW_SLOT)
     
     return unload_ok

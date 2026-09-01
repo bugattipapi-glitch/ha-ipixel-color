@@ -97,6 +97,15 @@ redirects, private-network targets, oversized files, excessive frame counts,
 and overlong loops. See [MEDIA-SERVICE.md](MEDIA-SERVICE.md) for the complete
 safety limits and examples.
 
+**Fixed-header ticker:**
+1. Call `ipixel_color.display_ticker`
+2. Select the iPIXEL device
+3. Provide a short fixed `header` and a longer `ticker`
+4. Optionally set six-character RGB colors and frame duration
+
+The ticker is rendered locally as a 32x32 GIF with a fixed top line and a
+scrolling lower band. It is also unslotted and limited to 32 frames.
+
 **Text Mode:**
 1. Select mode: `textimage` (for RGB colors) or `text` (native)
 2. Set text: `"Hello\nWorld"`
@@ -138,6 +147,7 @@ safety limits and examples.
 | ✅ State Persistence | Complete |
 | ✅ Brightness Control | Complete |
 | ✅ Bounded remote GIF/PNG playback | Complete |
+| ✅ Fixed-header local ticker | Complete |
 | 🔄 Animated Variable-Width Fonts | Planned |
 
 ## Technical

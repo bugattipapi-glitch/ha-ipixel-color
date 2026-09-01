@@ -95,6 +95,19 @@
         }
       }
     },
+    "display_ticker": {
+      "name": "Display ticker",
+      "description": "Display a fixed header above an animated lower-band ticker without saving to a hardware slot.",
+      "fields": {
+        "device_id": { "name": "Device", "description": "iPIXEL display to control." },
+        "header": { "name": "Header", "description": "Fixed uppercase header, up to 12 characters." },
+        "ticker": { "name": "Ticker text", "description": "Text to scroll beneath the header." },
+        "header_color": { "name": "Header color", "description": "Six-character RGB hex value." },
+        "ticker_color": { "name": "Ticker color", "description": "Six-character RGB hex value." },
+        "background_color": { "name": "Background color", "description": "Six-character RGB hex value." },
+        "frame_duration": { "name": "Frame duration", "description": "Milliseconds per ticker frame." }
+      }
+    },
     "show_slot": {
       "name": "Show existing slot",
       "description": "Display an existing device slot without changing its contents.",

@@ -82,6 +82,57 @@ display_media:
             - fit
             - crop
 
+display_ticker:
+  name: Display ticker
+  description: Display a fixed header above an animated lower-band ticker without saving to a hardware slot.
+  fields:
+    device_id:
+      name: Device
+      description: iPIXEL display to control.
+      required: true
+      selector:
+        device:
+          integration: ipixel_color
+    header:
+      name: Header
+      description: Fixed uppercase header, up to 12 characters.
+      required: true
+      selector:
+        text:
+    ticker:
+      name: Ticker text
+      description: Text to scroll beneath the header, up to 160 characters.
+      required: true
+      selector:
+        text:
+    header_color:
+      name: Header color
+      description: Six-character RGB hex value without a leading hash.
+      default: "50ffa0"
+      selector:
+        text:
+    ticker_color:
+      name: Ticker color
+      description: Six-character RGB hex value without a leading hash.
+      default: "ffc040"
+      selector:
+        text:
+    background_color:
+      name: Background color
+      description: Six-character RGB hex value without a leading hash.
+      default: "02061e"
+      selector:
+        text:
+    frame_duration:
+      name: Frame duration
+      description: Milliseconds per ticker frame.
+      default: 140
+      selector:
+        number:
+          min: 80
+          max: 500
+          mode: slider
+
 show_slot:
   name: Show existing slot
   description: Display an existing device slot without changing its contents.
