@@ -10,6 +10,9 @@ from PIL import Image, ImageDraw, ImageFont
 DISPLAY_SIZE = 32
 MAX_FRAMES = 32
 FONT_PATH = Path(__file__).parent / "fonts" / "5x5.ttf"
+HEADER_FONT_SIZE = 8
+TICKER_FONT_SIZE = 14
+TICKER_Y = 14
 
 
 def _rgb(value: str) -> tuple[int, int, int]:
@@ -38,8 +41,8 @@ def render_ticker_gif(
     if not header or not ticker:
         raise ValueError("Ticker header and text must not be empty")
 
-    header_font = ImageFont.truetype(str(FONT_PATH), 8)
-    ticker_font = ImageFont.truetype(str(FONT_PATH), 7)
+    header_font = ImageFont.truetype(str(FONT_PATH), HEADER_FONT_SIZE)
+    ticker_font = ImageFont.truetype(str(FONT_PATH), TICKER_FONT_SIZE)
     background = _rgb(background_color)
     header_rgb = _rgb(header_color)
     ticker_rgb = _rgb(ticker_color)
@@ -63,7 +66,7 @@ def render_ticker_gif(
         )
         draw.line((1, 10, 30, 10), fill=header_rgb)
         ticker_x = (DISPLAY_SIZE - ticker_width) // 2 if frame_count == 1 else DISPLAY_SIZE - index * step
-        draw.text((ticker_x, 15), ticker, fill=ticker_rgb, font=ticker_font)
+        draw.text((ticker_x, TICKER_Y), ticker, fill=ticker_rgb, font=ticker_font)
         frames.append(frame)
 
     palette_source = Image.new("RGB", (DISPLAY_SIZE * len(frames), DISPLAY_SIZE))

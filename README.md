@@ -104,7 +104,8 @@ safety limits and examples.
 4. Optionally set six-character RGB colors and frame duration
 
 The ticker is rendered locally as a 32x32 GIF with a fixed top line and a
-scrolling lower band. It is also unslotted and limited to 32 frames.
+large single-line scrolling lower band. It is also unslotted and limited to
+32 frames.
 
 **Text Mode:**
 1. Select mode: `textimage` (for RGB colors) or `text` (native)
