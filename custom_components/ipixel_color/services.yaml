@@ -133,6 +133,27 @@ display_ticker:
           max: 500
           mode: slider
 
+poll_team_feed:
+  name: Poll watched-team feed
+  description: Poll a small public watched-team JSON feed and emit internal pregame or settled-score events.
+  fields:
+    url:
+      name: HTTPS feed URL
+      description: Direct public URL for the sanitized watched-team JSON feed.
+      required: true
+      selector:
+        text:
+          type: url
+    mode:
+      name: Poll mode
+      description: Emit a pregame event or track settled score changes.
+      required: true
+      selector:
+        select:
+          options:
+            - score
+            - pregame
+
 show_slot:
   name: Show existing slot
   description: Display an existing device slot without changing its contents.

@@ -77,6 +77,14 @@
         "frame_duration": { "name": "Frame duration", "description": "Milliseconds per ticker frame." }
       }
     },
+    "poll_team_feed": {
+      "name": "Poll watched-team feed",
+      "description": "Poll a sanitized watched-team JSON feed and emit internal pregame or settled-score events.",
+      "fields": {
+        "url": { "name": "HTTPS feed URL", "description": "Direct public URL for the watched-team JSON feed." },
+        "mode": { "name": "Poll mode", "description": "Emit pregame information or track settled score changes." }
+      }
+    },
     "show_slot": {
       "name": "Show existing slot",
       "description": "Display an existing device slot without changing its contents.",

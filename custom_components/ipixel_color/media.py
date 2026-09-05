@@ -34,7 +34,7 @@ def _validate_ip(address: str) -> None:
         raise HomeAssistantError("The media URL must resolve to a public internet address")
 
 
-async def _validate_remote_url(hass: HomeAssistant, url: str) -> None:
+async def async_validate_remote_url(hass: HomeAssistant, url: str) -> None:
     """Allow HTTPS public-internet URLs only."""
     parsed = urlsplit(url)
     if parsed.scheme.lower() != "https":
@@ -105,7 +105,7 @@ async def async_download_media(hass: HomeAssistant, url: str) -> tuple[bytes, st
     if cached and now - cached[0] < CACHE_SECONDS:
         return cached[1], cached[2]
 
-    await _validate_remote_url(hass, url)
+    await async_validate_remote_url(hass, url)
 
     session = async_get_clientsession(hass)
     try:

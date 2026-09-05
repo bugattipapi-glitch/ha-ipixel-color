@@ -107,6 +107,16 @@ The ticker is rendered locally as a 32x32 GIF with a fixed top line and a
 large single-line scrolling lower band. It is also unslotted and limited to
 32 frames.
 
+**Watched-team events:**
+1. Call `ipixel_color.poll_team_feed` against a small public HTTPS JSON feed.
+2. Use `pregame` mode to emit the current weekend's scheduled games.
+3. Use `score` mode on a short interval to emit one event after a score settles.
+
+The first score poll seeds silently. Later increases settle for 25 seconds so
+a touchdown and its conversion become one event; a late conversion-only update
+within two minutes is suppressed. The service emits only local Home Assistant
+events and never exposes Home Assistant to the public feed.
+
 **Text Mode:**
 1. Select mode: `textimage` (for RGB colors) or `text` (native)
 2. Set text: `"Hello\nWorld"`

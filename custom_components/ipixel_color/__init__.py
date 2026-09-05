@@ -16,6 +16,7 @@ from .api import iPIXELAPI, iPIXELConnectionError, iPIXELTimeoutError
 from .const import DOMAIN, CONF_ADDRESS, CONF_NAME
 from .media import async_download_media
 from .ticker import render_ticker_gif
+from .sports import async_poll_team_feed
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -24,6 +25,7 @@ PLATFORMS: list[Platform] = [Platform.SWITCH, Platform.TEXT, Platform.SENSOR, Pl
 
 SERVICE_DISPLAY_MEDIA = "display_media"
 SERVICE_DISPLAY_TICKER = "display_ticker"
+SERVICE_POLL_TEAM_FEED = "poll_team_feed"
 SERVICE_SHOW_SLOT = "show_slot"
 
 DISPLAY_MEDIA_SCHEMA = vol.Schema(
@@ -52,6 +54,13 @@ DISPLAY_TICKER_SCHEMA = vol.Schema(
         vol.Optional("frame_duration", default=140): vol.All(
             vol.Coerce(int), vol.Range(min=80, max=500)
         ),
+    }
+)
+
+POLL_TEAM_FEED_SCHEMA = vol.Schema(
+    {
+        vol.Required("url"): cv.url,
+        vol.Required("mode"): vol.In(("score", "pregame")),
     }
 )
 
@@ -149,6 +158,17 @@ def _register_services(hass: HomeAssistant) -> None:
             schema=DISPLAY_TICKER_SCHEMA,
         )
 
+    if not hass.services.has_service(DOMAIN, SERVICE_POLL_TEAM_FEED):
+        async def _poll_team_feed(call: ServiceCall) -> None:
+            await async_poll_team_feed(hass, call.data["url"], call.data["mode"])
+
+        hass.services.async_register(
+            DOMAIN,
+            SERVICE_POLL_TEAM_FEED,
+            _poll_team_feed,
+            schema=POLL_TEAM_FEED_SCHEMA,
+        )
+
     if not hass.services.has_service(DOMAIN, SERVICE_SHOW_SLOT):
         async def _show_slot(call: ServiceCall) -> None:
             api = _api_for_device(hass, call.data[ATTR_DEVICE_ID])
@@ -180,6 +200,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         if not hass.data[DOMAIN]:
             hass.services.async_remove(DOMAIN, SERVICE_DISPLAY_MEDIA)
             hass.services.async_remove(DOMAIN, SERVICE_DISPLAY_TICKER)
+            hass.services.async_remove(DOMAIN, SERVICE_POLL_TEAM_FEED)
             hass.services.async_remove(DOMAIN, SERVICE_SHOW_SLOT)
     
     return unload_ok
